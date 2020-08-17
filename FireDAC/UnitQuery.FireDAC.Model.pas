@@ -53,6 +53,8 @@ function TQueryFireDAC.Clear: iQuery;
 begin
   Result := Self;
   FSQL.Clear;
+  FParams.Clear;
+  FCampoBlob.Clear;
 end;
 
 constructor TQueryFireDAC.Create(Value: iConexao);
