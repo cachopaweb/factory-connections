@@ -19,7 +19,8 @@ type
     public
       constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
       destructor Destroy; override;
-      class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey') : iConexao;
+      class var Instancia: iConexao;
+      class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iConexao;
       function Conexao: TObject;
   end;
 
@@ -55,9 +56,17 @@ begin
   inherited;
 end;
 
-class function TConexaoFireDAC.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey') : iConexao;
+class function TConexaoFireDAC.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iConexao;
 begin
-  result := Self.Create(CaminhoBD, Usuario, Senha);
+  if Singleton then
+  begin
+    if not Assigned(Instancia) then
+    begin
+      Instancia := Self.Create(CaminhoBD, Usuario, Senha);
+    end;
+    result := Instancia;
+  end else
+    Result := Self.Create(CaminhoBD, Usuario, Senha);
 end;
 
 end.

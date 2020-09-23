@@ -14,7 +14,7 @@ type
       constructor Create;
       destructor Destroy; override;
       class function New : iFactoryConexao;
-      function Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'): iConexao;
+      function Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
       function Query(Conexao: iConexao): iQuery;
   end;
 
@@ -24,10 +24,10 @@ implementation
 
 { TFactoryConexaoFireDAC }
 
-function TFactoryConexaoFireDAC.Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'): iConexao;
+function TFactoryConexaoFireDAC.Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
 begin
   FCaminhoBD := CaminhoBD;
-  Result := TConexaoFireDAC.New(CaminhoBD, Usuario, Senha);
+  Result := TConexaoFireDAC.New(CaminhoBD, Usuario, Senha, Singleton);
 end;
 
 constructor TFactoryConexaoFireDAC.Create;
