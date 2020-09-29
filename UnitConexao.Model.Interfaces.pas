@@ -22,19 +22,9 @@ uses
       function DataSource(Value: TDataSource): iQuery;
     end;
 
-    iProdutos = interface
-      ['{CA36B1F7-F79A-45A1-A2B8-D3DDA0610ADB}']
-      function SetCodigo(Value: integer): iProdutos;
-    end;
-
-    iEntidades = interface
-      ['{D752FE22-A63C-4F3A-908E-A7442613AEA5}']
-      function Produtos: iProdutos;
-    end;
-
     iFactoryConexao = interface
       ['{4830BCA5-B7F0-4592-B6EE-D85F9A126867}']
-      function Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'): iConexao;
+      function Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = True): iConexao;
       function Query(Conexao: iConexao): iQuery;
     end;
 
