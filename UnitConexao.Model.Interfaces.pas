@@ -8,6 +8,7 @@ uses
     iConexao = interface
       ['{FA5FBBEB-2FDF-4395-8994-61D1DD98D8FD}']
       function Conexao: TObject;
+      function Transacao: TObject;
     end;
 
     iQuery = interface

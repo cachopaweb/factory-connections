@@ -16,7 +16,6 @@ type
       FQuery: TFDQuery;
       FConexao: iConexao;
       FDatasource: TDataSource;
-      FTransacao: TFDTransaction;
       FSQL: TStringList;
       FParams: TDictionary<string, variant>;
       FCampoBlob: TDictionary<string, boolean>;
@@ -62,10 +61,9 @@ constructor TQueryFireDAC.Create(Value: iConexao);
 begin
   FQuery := TFDQuery.Create(nil);
   FConexao := Value;
-  FQuery.Connection := TFDConnection(FConexao.Conexao);
+  FQuery.Connection  := TFDConnection(FConexao.Conexao);
+  FQuery.Transaction := TFDTransaction(FConexao.Transacao);
   FQuery.CachedUpdates := True;
-  FTransacao := TFDTransaction.Create(nil);
-  FQuery.Transaction := FTransacao;
   FSQL := TStringList.Create;
   FParams := TDictionary<string, variant>.Create;
   FCampoBlob := TDictionary<String, Boolean>.Create;

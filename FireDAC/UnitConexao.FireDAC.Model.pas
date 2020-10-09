@@ -7,12 +7,14 @@ uses UnitConexao.Model.Interfaces,
      FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
      FireDAC.Phys, Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FB,
      FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-     FireDAC.Comp.UI;
+     FireDAC.Comp.UI,
+     FireDAC.VCLUI.Wait;
 
 type
   TConexaoFireDAC = class(TInterfacedObject, iConexao)
     private
       FConexao: TFDConnection;
+      FTransacao: TFDTransaction;
       FBLink: TFDPhysFBDriverLink;
       FDGui: TFDGUIxWaitCursor;
       FCaminhoBD: string;
@@ -22,6 +24,7 @@ type
       class var Instancia: iConexao;
       class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iConexao;
       function Conexao: TObject;
+      function Transacao: TObject;
   end;
 
 implementation
@@ -39,6 +42,7 @@ end;
 constructor TConexaoFireDAC.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
 begin
   FCaminhoBD := CaminhoBD;
+  FDGui := TFDGUIxWaitCursor.Create(nil);
   FBLink := TFDPhysFBDriverLink.Create(nil);
   //FBLink.VendorLib := '/home/bin/fbclient.dll';
   FConexao := TFDConnection.Create(nil);
@@ -47,8 +51,11 @@ begin
   FConexao.Params.UserName := Usuario;
   FConexao.Params.Password := Senha;
   FConexao.LoginPrompt     := False;
+  FTransacao := TFDTransaction.Create(nil);
+  FTransacao.Options.AutoCommit := False;
+  FTransacao.Options.Isolation := xiReadCommitted;
+  FConexao.Transaction := FTransacao;
   FConexao.Connected := True;
-  FDGui := TFDGUIxWaitCursor.Create(nil);
 end;
 
 destructor TConexaoFireDAC.Destroy;
@@ -67,6 +74,11 @@ begin
     result := Instancia;
   end else
     Result := Self.Create(CaminhoBD, Usuario, Senha);
+end;
+
+function TConexaoFireDAC.Transacao: TObject;
+begin
+  Result := FTransacao;
 end;
 
 end.
