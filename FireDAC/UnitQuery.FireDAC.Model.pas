@@ -16,6 +16,7 @@ type
       FQuery: TFDQuery;
       FConexao: iConexao;
       FDatasource: TDataSource;
+      FTransacao: TFDTransaction;
       FSQL: TStringList;
       FParams: TDictionary<string, variant>;
       FCampoBlob: TDictionary<string, boolean>;
@@ -63,6 +64,8 @@ begin
   FConexao := Value;
   FQuery.Connection := TFDConnection(FConexao.Conexao);
   FQuery.CachedUpdates := True;
+  FTransacao := TFDTransaction.Create(nil);
+  FQuery.Transaction := FTransacao;
   FSQL := TStringList.Create;
   FParams := TDictionary<string, variant>.Create;
   FCampoBlob := TDictionary<String, Boolean>.Create;
@@ -89,6 +92,8 @@ var
   campoBlob: Boolean;
 begin
   try
+    if not FQuery.Transaction.Active then
+      FQuery.Transaction.StartTransaction;
     FQuery.Close;
     FQuery.SQL.Clear;
     FQuery.SQL.Add(FSQL.Text);
@@ -110,9 +115,10 @@ begin
     FQuery.ExecSQL;
     if Assigned(FDatasource) then
       FDatasource.DataSet := FQuery;
+    FQuery.Transaction.Commit;
   except on E: exception do
     begin
-      FQuery.Transaction.RollbackRetaining;
+      FQuery.Transaction.Rollback;
       raise Exception.Create(E.Message);
     end;
   end;
@@ -129,6 +135,8 @@ var
   Valor: Variant;
 begin
   try
+    if not FQuery.Transaction.Active then
+      FQuery.Transaction.StartTransaction;
     FQuery.Close;
     FQuery.SQL.Clear;
     FQuery.SQL.Add(FSQL.Text);
@@ -143,9 +151,10 @@ begin
     FQuery.Open;
     if Assigned(FDatasource) then
       FDatasource.DataSet := FQuery;
+    FQuery.Transaction.Commit;
   except on E: exception do
     begin
-      FQuery.Transaction.RollbackRetaining;
+      FQuery.Transaction.Rollback;
       raise Exception.Create(E.Message);
     end;
   end;
