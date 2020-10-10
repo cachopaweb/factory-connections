@@ -7,8 +7,7 @@ uses UnitConexao.Model.Interfaces,
      FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
      FireDAC.Phys, Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FB,
      FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-     FireDAC.Comp.UI,
-     FireDAC.VCLUI.Wait;
+     FireDAC.Comp.UI;
 
 type
   TConexaoFireDAC = class(TInterfacedObject, iConexao)
