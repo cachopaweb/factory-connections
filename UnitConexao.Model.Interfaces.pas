@@ -25,8 +25,7 @@ uses
 
     iFactoryConexao = interface
       ['{4830BCA5-B7F0-4592-B6EE-D85F9A126867}']
-      function Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = True): iConexao;
-      function Query(Conexao: iConexao): iQuery;
+      function Query: iQuery;
     end;
 
 implementation

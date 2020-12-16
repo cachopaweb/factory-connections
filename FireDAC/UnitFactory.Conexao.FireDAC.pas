@@ -9,13 +9,12 @@ uses UnitConexao.Model.Interfaces,
 type
   TFactoryConexaoFireDAC = class(TInterfacedObject, iFactoryConexao)
     private
-      FCaminhoBD: string;
+      FConexao: iConexao;
     public
-      constructor Create;
+      constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true);
       destructor Destroy; override;
-      class function New : iFactoryConexao;
-      function Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
-      function Query(Conexao: iConexao): iQuery;
+      class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iFactoryConexao;
+      function Query: iQuery;
   end;
 
 implementation
@@ -24,15 +23,9 @@ implementation
 
 { TFactoryConexaoFireDAC }
 
-function TFactoryConexaoFireDAC.Conexao(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
+constructor TFactoryConexaoFireDAC.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true);
 begin
-  FCaminhoBD := CaminhoBD;
-  Result := TConexaoFireDAC.New(CaminhoBD, Usuario, Senha, Singleton);
-end;
-
-constructor TFactoryConexaoFireDAC.Create;
-begin
-
+  FConexao := TConexaoFireDAC.New(CaminhoBD, Usuario, Senha, Singleton);
 end;
 
 destructor TFactoryConexaoFireDAC.Destroy;
@@ -41,14 +34,14 @@ begin
   inherited;
 end;
 
-class function TFactoryConexaoFireDAC.New: iFactoryConexao;
+class function TFactoryConexaoFireDAC.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iFactoryConexao;
 begin
-  result := Self.Create;
+  result := Self.Create(CaminhoBD, Usuario, Senha, Singleton);
 end;
 
-function TFactoryConexaoFireDAC.Query(Conexao: iConexao): iQuery;
+function TFactoryConexaoFireDAC.Query: iQuery;
 begin
-  Result := TQueryFireDAC.New(Conexao);
+  Result := TQueryFireDAC.New(FConexao);
 end;
 
 end.
