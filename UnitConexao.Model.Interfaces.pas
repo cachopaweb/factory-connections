@@ -3,12 +3,19 @@ unit UnitConexao.Model.Interfaces;
 interface
 
 uses
-  Data.DB;
+  Data.DB, System.Generics.Collections,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
+  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Phys, FireDAC.Comp.Client, FireDAC.Phys.FB,
+  FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
+  FireDAC.Comp.UI;
+
   type
     iConexao = interface
       ['{FA5FBBEB-2FDF-4395-8994-61D1DD98D8FD}']
-      function Conexao: TObject;
-      function Transacao: TObject;
+      function Connected : Integer;
+      procedure Disconnected(Index : Integer);
+      function GetListaConexoes: TObjectList<TFDConnection>;
     end;
 
     iQuery = interface
@@ -20,7 +27,7 @@ uses
       function Add(Value: string): iQuery;
       function AddParam(Param: string; Value: variant; Blob: Boolean = false): iQuery;
       function ExecSQL: iQuery;
-      function DataSource(Value: TDataSource): iQuery;
+      function DataSet: TDataSet;
     end;
 
     iFactoryConexao = interface

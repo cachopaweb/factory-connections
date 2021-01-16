@@ -15,10 +15,11 @@ type
     private
       FQuery: TFDQuery;
       FConexao: iConexao;
-      FDatasource: TDataSource;
+      FDataSet: TDataSet;
       FSQL: TStringList;
       FParams: TDictionary<string, variant>;
       FCampoBlob: TDictionary<string, boolean>;
+      FIndiceConexao: Integer;
     public
       constructor Create(Value: iConexao);
       destructor Destroy; override;
@@ -30,7 +31,7 @@ type
       function ExecSQL: iQuery;
       function Query: TObject;
       function Clear: iQuery;
-      function DataSource(Value: TDataSource): iQuery;
+      function DataSet: TDataSet;
   end;
 
 implementation
@@ -59,20 +60,20 @@ end;
 
 constructor TQueryFireDAC.Create(Value: iConexao);
 begin
+  FDataSet := TDataSet.Create(nil);
   FQuery := TFDQuery.Create(nil);
   FConexao := Value;
-  FQuery.Connection  := TFDConnection(FConexao.Conexao);
-  FQuery.Transaction := TFDTransaction(FConexao.Transacao);
+  FIndiceConexao := FConexao.Connected;
+  FQuery.Connection  := TFDConnection(FConexao.GetListaConexoes[FIndiceConexao]);
   FQuery.CachedUpdates := True;
   FSQL := TStringList.Create;
   FParams := TDictionary<string, variant>.Create;
   FCampoBlob := TDictionary<String, Boolean>.Create;
 end;
 
-function TQueryFireDAC.DataSource(Value: TDataSource): iQuery;
+function TQueryFireDAC.DataSet: TDataSet;
 begin
-  Result := Self;
-  FDatasource := Value;
+  Result := FDataSet;
 end;
 
 destructor TQueryFireDAC.Destroy;
@@ -80,6 +81,7 @@ begin
   FreeAndNil(FParams);
   FreeAndNil(FSQL);
   FreeAndNil(FCampoBlob);
+  FConexao.Disconnected(FIndiceConexao);
   inherited;
 end;
 
@@ -90,8 +92,6 @@ var
   campoBlob: Boolean;
 begin
   try
-    if not FQuery.Transaction.Active then
-      FQuery.Transaction.StartTransaction;
     FQuery.Close;
     FQuery.SQL.Clear;
     FQuery.SQL.Add(FSQL.Text);
@@ -111,12 +111,9 @@ begin
       end;
     end;
     FQuery.ExecSQL;
-    if Assigned(FDatasource) then
-      FDatasource.DataSet := FQuery;
-    FQuery.Transaction.Commit;
+    FDataSet := FQuery;
   except on E: exception do
     begin
-      FQuery.Transaction.Rollback;
       raise Exception.Create(E.Message);
     end;
   end;
@@ -133,8 +130,6 @@ var
   Valor: Variant;
 begin
   try
-    if not FQuery.Transaction.Active then
-      FQuery.Transaction.StartTransaction;
     FQuery.Close;
     FQuery.SQL.Clear;
     FQuery.SQL.Add(FSQL.Text);
@@ -147,12 +142,9 @@ begin
       end;
     end;
     FQuery.Open;
-    if Assigned(FDatasource) then
-      FDatasource.DataSet := FQuery;
-    FQuery.Transaction.Commit;
+    FDataSet := FQuery;
   except on E: exception do
     begin
-      FQuery.Transaction.Rollback;
       raise Exception.Create(E.Message);
     end;
   end;
@@ -165,8 +157,7 @@ begin
   FQuery.SQL.Clear;
   FQuery.SQL.Add(Value);
   FQuery.Open;
-  if Assigned(FDatasource) then
-    FDatasource.DataSet := FQuery;
+  FDataSet := FQuery;
 end;
 
 function TQueryFireDAC.Query: TObject;
