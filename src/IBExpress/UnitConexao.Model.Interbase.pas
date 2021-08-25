@@ -45,7 +45,7 @@ begin
   TIBDatabase(FConnList.Items[Result]).LoginPrompt := False;
   TIBDatabase(FConnList.Items[Result]).Connected := True;
   FTransacao := TIBTransaction.Create(nil);
-  FTransacao.DefaultDatabase := TIBDataBase(Self);
+  FTransacao.DefaultDatabase := TIBDataBase(TIBDatabase(FConnList.Items[Result]));
 end;
 
 constructor TConexaoInterbase.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
