@@ -7,6 +7,7 @@ uses UnitConexao.Model.Interfaces,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FB,
   FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
+  FireDAC.VCLUI.Wait,
   FireDAC.Comp.UI, System.Generics.Collections;
 
 type
@@ -16,7 +17,8 @@ type
     FCaminhoBD: string;
     FUsuario  : string;
     FSenha    : string;
-    FConnList: TObjectList<TFDConnection>;
+    FConnList: TObjectList<TObject>;
+    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
   public
     constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
     destructor Destroy; override;
@@ -24,7 +26,7 @@ type
     class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
     function Connected: Integer;
     procedure Disconnected(Index: Integer);
-    function GetListaConexoes: TObjectList<TFDConnection>;
+    function GetListaConexoes: TObjectList<TObject>;
   end;
 
 var
@@ -42,6 +44,7 @@ begin
   FCaminhoBD := CaminhoBD;
   FUsuario   := Usuario;
   FSenha     := Senha;
+  FDGUIxWaitCursor1 := TFDGUIxWaitCursor.Create(nil);
 end;
 
 destructor TConexaoFireDAC.Destroy;
@@ -67,25 +70,25 @@ end;
 function TConexaoFireDAC.Connected: Integer;
 begin
   if not Assigned(FConnList) then
-    FConnList := TObjectList<TFDConnection>.Create;
+    FConnList := TObjectList<TObject>.Create;
 
   FConnList.Add(TFDConnection.Create(nil));
   Result := Pred(FConnList.Count);
-  FConnList.Items[Result].Params.DriverID := 'FB';
-  FConnList.Items[Result].Params.Database := FCaminhoBD;
-  FConnList.Items[Result].Params.UserName := FUsuario;
-  FConnList.Items[Result].Params.Password := FSenha;
-  FConnList.Items[Result].Connected;
+  TFDConnection(FConnList.Items[Result]).Params.DriverID := 'FB';
+  TFDConnection(FConnList.Items[Result]).Params.Database := FCaminhoBD;
+  TFDConnection(FConnList.Items[Result]).Params.UserName := FUsuario;
+  TFDConnection(FConnList.Items[Result]).Params.Password := FSenha;
+  TFDConnection(FConnList.Items[Result]).Connected;
 end;
 
 procedure TConexaoFireDAC.Disconnected(Index: Integer);
 begin
-  FConnList.Items[Index].Connected := False;
+  TFDConnection(FConnList.Items[Index]).Connected := False;
   FConnList.Items[Index].Free;
   FConnList.TrimExcess;
 end;
 
-function TConexaoFireDAC.GetListaConexoes: TObjectList<TFDConnection>;
+function TConexaoFireDAC.GetListaConexoes: TObjectList<TObject>;
 begin
   Result := FConnList;
 end;
