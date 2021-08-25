@@ -63,12 +63,14 @@ end;
 
 procedure TConexaoInterbase.Disconnected(Index: Integer);
 begin
-
+  TIBDatabase(FConnList.Items[Index]).Connected := False;
+  FConnList.Items[Index].Free;
+  FConnList.TrimExcess;
 end;
 
 function TConexaoInterbase.GetListaConexoes: TObjectList<TObject>;
 begin
-
+  Result := FConnList;
 end;
 
 class function TConexaoInterbase.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
