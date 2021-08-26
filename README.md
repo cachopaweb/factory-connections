@@ -17,7 +17,7 @@ uses System.SysUtils,
      UnitConexao.Model.Interfaces,
      UnitFactory.Conexao.FireDAC;
 
-procedure BuscaClientePorCodigo(Codigo: integer);
+function BuscaClientePorCodigo(Codigo: integer): TJSONArray;
 var
   Query: iQuery;
   oJson: TJSONObject;
@@ -47,7 +47,7 @@ uses System.SysUtils,
      UnitConexao.Model.Interfaces,
      UnitFactory.Conexao.Interbase;
 
-procedure BuscaClientePorCodigo(Codigo: integer);
+function BuscaClientePorCodigo(Codigo: integer): TJSONArray;
 var
   Query: iQuery;
   oJson: TJSONObject;
