@@ -14,8 +14,8 @@ $ boss install https://github.com/CachopaWeb/factory-conection
 
 uses System.SysUtils,
      System.Json,
-     UnitConexao.Model.Interfaces,
-     UnitFactory.Conexao.FireDAC;
+     UnitConnection.Model.Interfaces,
+     UnitFactory.Connection.Firedac;
 
 function BuscaClientePorCodigo(Codigo: integer): TJSONArray;
 var
@@ -23,7 +23,7 @@ var
   oJson: TJSONObject;
 begin
   Result := TJSONArray.Create; 
-  Query := TFactoryConexaoFireDAC.New('caminhoBD', 'usuario', 'senha').Query;
+  Query := TFactoryConnectionFiredac.New('caminhoBD', 'usuario', 'senha').Query;
   Query.Add('SELECT CLI_CODIGO, CLI_NOME FROM CLIENTES WHERE CLI_CODIGO = :CODIGO');
   Query.AddParm('CODIGO', Codigo);
   Query.Open;
@@ -45,7 +45,7 @@ end.
 uses System.SysUtils,
      System.Json,
      UnitConexao.Model.Interfaces,
-     UnitFactory.Conexao.Interbase;
+     UnitFactory.Connection.IBExpress;
 
 function BuscaClientePorCodigo(Codigo: integer): TJSONArray;
 var
@@ -53,7 +53,7 @@ var
   oJson: TJSONObject;
 begin
   Result := TJSONArray.Create; 
-  Query := TFactoryConexaoInterbase.New('caminhoBD', 'usuario', 'senha').Query;
+  Query := TFactoryConnectionIBExpress.New('caminhoBD', 'usuario', 'senha').Query;
   Query.Add('SELECT CLI_CODIGO, CLI_NOME FROM CLIENTES WHERE CLI_CODIGO = :CODIGO');
   Query.AddParm('CODIGO', Codigo);
   Query.Open;
