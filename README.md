@@ -1,10 +1,10 @@
 # factory-conection
 
-Create connection queries for fireDAC and ibexpress
+Create connection queries for Firedac and IBExpress
 
 ### For install in your project using [boss](https://github.com/HashLoad/boss):
 ``` sh
-$ boss install https://github.com/CachopaWeb/factory-conection
+$ boss install https://github.com/CachopaWeb/factory-connections
 ```
 
 ## Sample Factory Connection FireDAC
