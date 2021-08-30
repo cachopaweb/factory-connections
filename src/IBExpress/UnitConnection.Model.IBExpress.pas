@@ -57,14 +57,14 @@ end;
 
 destructor TConnectionIBExpress.Destroy;
 begin
-  FreeAndNil(FConnection);
+  FTransaction.DisposeOf;
+  FConnList.DisposeOf;
   inherited;
 end;
 
 procedure TConnectionIBExpress.Disconnected(Index: Integer);
 begin
   TIBDatabase(FConnList.Items[Index]).Connected := False;
-  FConnList.Items[Index].Free;
   FConnList.TrimExcess;
 end;
 

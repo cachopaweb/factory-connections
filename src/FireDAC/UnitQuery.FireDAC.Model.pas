@@ -15,7 +15,6 @@ type
     private
       FQuery: TFDQuery;
       FConexao: iConnection;
-      FDataSet: TDataSet;
       FSQL: TStringList;
       FParams: TDictionary<string, variant>;
       FCampoBlob: TDictionary<string, boolean>;
@@ -60,7 +59,6 @@ end;
 
 constructor TQueryFirerac.Create(Value: iConnection);
 begin
-  FDataSet := TDataSet.Create(nil);
   FQuery := TFDQuery.Create(nil);
   FConexao := Value;
   FIndiceConexao := FConexao.Connected;
@@ -73,11 +71,12 @@ end;
 
 function TQueryFirerac.DataSet: TDataSet;
 begin
-  Result := FDataSet;
+  Result := FQuery;
 end;
 
 destructor TQueryFirerac.Destroy;
 begin
+  FQuery.DisposeOf;
   FreeAndNil(FParams);
   FreeAndNil(FSQL);
   FreeAndNil(FCampoBlob);
@@ -111,7 +110,6 @@ begin
       end;
     end;
     FQuery.ExecSQL;
-    FDataSet := FQuery;
   except on E: exception do
     begin
       raise Exception.Create(E.Message);
@@ -142,7 +140,6 @@ begin
       end;
     end;
     FQuery.Open;
-    FDataSet := FQuery;
   except on E: exception do
     begin
       raise Exception.Create(E.Message);
@@ -157,7 +154,6 @@ begin
   FQuery.SQL.Clear;
   FQuery.SQL.Add(Value);
   FQuery.Open;
-  FDataSet := FQuery;
 end;
 
 function TQueryFirerac.Query: TObject;

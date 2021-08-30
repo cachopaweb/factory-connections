@@ -49,7 +49,8 @@ end;
 
 destructor TConnectionFiredac.Destroy;
 begin
-  FConnList.Free;
+  FConnList.DisposeOf;
+  FDGUIxWaitCursor1.DisposeOf;
   inherited;
 end;
 
@@ -84,7 +85,6 @@ end;
 procedure TConnectionFiredac.Disconnected(Index: Integer);
 begin
   TFDConnection(FConnList.Items[Index]).Connected := False;
-  FConnList.Items[Index].Free;
   FConnList.TrimExcess;
 end;
 

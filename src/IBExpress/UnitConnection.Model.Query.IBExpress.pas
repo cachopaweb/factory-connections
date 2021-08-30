@@ -14,7 +14,6 @@ type
   private
     FQuery: TIBQuery;
     FConnection: iConnection;
-    FDataSet: TDataSet;
     FSQL: TStringList;
     FParams: TDictionary<string, variant>;
     FCampoBlob: TDictionary<string, boolean>;
@@ -57,7 +56,6 @@ end;
 
 constructor TQueryIBExpress.Create(Value: iConnection);
 begin
-  FDataSet             := TDataSet.Create(nil);
   FQuery               := TIBQuery.Create(nil);
   FConnection             := Value;
   FIndiceConexao       := FConnection.Connected;
@@ -70,11 +68,12 @@ end;
 
 function TQueryIBExpress.DataSet: TDataSet;
 begin
-  Result := FDataSet;
+  Result := FQuery;
 end;
 
 destructor TQueryIBExpress.Destroy;
 begin
+  FQuery.DisposeOf;
   FreeAndNil(FParams);
   FreeAndNil(FSQL);
   FreeAndNil(FCampoBlob);
@@ -108,7 +107,6 @@ begin
       end;
     end;
     FQuery.ExecSQL;
-    FDataSet := FQuery;
   except on E: exception do
     begin
       raise Exception.Create(E.Message);
@@ -139,7 +137,6 @@ begin
       end;
     end;
     FQuery.Open;
-    FDataSet := FQuery;
   except on E: exception do
     begin
       raise Exception.Create(E.Message);
@@ -154,7 +151,6 @@ begin
   FQuery.SQL.Clear;
   FQuery.SQL.Add(Value);
   FQuery.Open;
-  FDataSet := FQuery;
 end;
 
 function TQueryIBExpress.Query: TObject;

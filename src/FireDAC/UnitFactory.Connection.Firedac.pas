@@ -7,7 +7,7 @@ uses UnitConnection.Model.Interfaces,
      UnitQuery.FireDAC.Model;
 
 type
-  TFactoryConexaoFiredac = class(TInterfacedObject, iFactoryConnection)
+  TFactoryConnectionFiredac = class(TInterfacedObject, iFactoryConnection)
     private
       FConexao: iConnection;
     public
@@ -23,23 +23,23 @@ implementation
 
 { TFactoryConexaoFireDAC }
 
-constructor TFactoryConexaoFiredac.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true);
+constructor TFactoryConnectionFiredac.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true);
 begin
   FConexao := TConnectionFiredac.New(CaminhoBD, Usuario, Senha, Singleton);
 end;
 
-destructor TFactoryConexaoFiredac.Destroy;
+destructor TFactoryConnectionFiredac.Destroy;
 begin
 
   inherited;
 end;
 
-class function TFactoryConexaoFiredac.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iFactoryConnection;
+class function TFactoryConnectionFiredac.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true) : iFactoryConnection;
 begin
   result := Self.Create(CaminhoBD, Usuario, Senha, Singleton);
 end;
 
-function TFactoryConexaoFiredac.Query: iQuery;
+function TFactoryConnectionFiredac.Query: iQuery;
 begin
   Result := TQueryFirerac.New(FConexao);
 end;
