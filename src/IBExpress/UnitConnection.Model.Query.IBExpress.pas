@@ -1,24 +1,28 @@
-unit UnitConexao.Model.Query.Interbase;
+unit UnitConnection.Model.Query.IBExpress;
 
 interface
 
-uses UnitConexao.Model.Interfaces, IBX.IBQuery, IBX.IBDatabase, Data.DB,
-  System.Classes, System.Generics.Collections;
+uses UnitConnection.Model.Interfaces,
+     IBX.IBQuery,
+     IBX.IBDatabase,
+     Data.DB,
+     System.Classes,
+     System.Generics.Collections;
 
 type
-  TQueryInterbase = class(TInterfacedObject, iQuery)
+  TQueryIBExpress = class(TInterfacedObject, iQuery)
   private
     FQuery: TIBQuery;
-    FConexao: iConexao;
+    FConnection: iConnection;
     FDataSet: TDataSet;
     FSQL: TStringList;
     FParams: TDictionary<string, variant>;
     FCampoBlob: TDictionary<string, boolean>;
     FIndiceConexao: Integer;
   public
-    constructor Create(Value: iConexao);
+    constructor Create(Value: iConnection);
     destructor Destroy; override;
-    class function New(Value: iConexao): iQuery;
+    class function New(Value: iConnection): iQuery;
     function Open(Value: string): iQuery; overload;
     function Open: iQuery; overload;
     function Query: TObject;
@@ -34,16 +38,16 @@ implementation
 uses
   System.SysUtils;
 
-{ TQueryInterbase }
+{ TQueryIBExpress }
 
-function TQueryInterbase.AddParam(Param: string; Value: variant; Blob: boolean): iQuery;
+function TQueryIBExpress.AddParam(Param: string; Value: variant; Blob: boolean): iQuery;
 begin
   Result := Self;
   FParams.AddOrSetValue(Param, Value);
   FCampoBlob.AddOrSetValue(Param, Blob);
 end;
 
-function TQueryInterbase.Clear: iQuery;
+function TQueryIBExpress.Clear: iQuery;
 begin
   Result := Self;
   FSQL.Clear;
@@ -51,34 +55,34 @@ begin
   FCampoBlob.Clear;
 end;
 
-constructor TQueryInterbase.Create(Value: iConexao);
+constructor TQueryIBExpress.Create(Value: iConnection);
 begin
   FDataSet             := TDataSet.Create(nil);
   FQuery               := TIBQuery.Create(nil);
-  FConexao             := Value;
-  FIndiceConexao       := FConexao.Connected;
-  FQuery.Database      := TIBDatabase(FConexao.GetListaConexoes[FIndiceConexao]);
+  FConnection             := Value;
+  FIndiceConexao       := FConnection.Connected;
+  FQuery.Database      := TIBDatabase(FConnection.GetListaConexoes[FIndiceConexao]);
   FQuery.CachedUpdates := True;
   FSQL                 := TStringList.Create;
   FParams              := TDictionary<string, variant>.Create;
   FCampoBlob           := TDictionary<String, boolean>.Create;
 end;
 
-function TQueryInterbase.DataSet: TDataSet;
+function TQueryIBExpress.DataSet: TDataSet;
 begin
   Result := FDataSet;
 end;
 
-destructor TQueryInterbase.Destroy;
+destructor TQueryIBExpress.Destroy;
 begin
   FreeAndNil(FParams);
   FreeAndNil(FSQL);
   FreeAndNil(FCampoBlob);
-  FConexao.Disconnected(FIndiceConexao);
+  FConnection.Disconnected(FIndiceConexao);
   inherited;
 end;
 
-function TQueryInterbase.ExecSQL: iQuery;
+function TQueryIBExpress.ExecSQL: iQuery;
 var
   param: string;
   Valor: Variant;
@@ -112,12 +116,12 @@ begin
   end;
 end;
 
-class function TQueryInterbase.New(Value: iConexao): iQuery;
+class function TQueryIBExpress.New(Value: iConnection): iQuery;
 begin
   Result := Self.Create(Value);
 end;
 
-function TQueryInterbase.Open: iQuery;
+function TQueryIBExpress.Open: iQuery;
 var
   param: string;
   Valor: Variant;
@@ -143,7 +147,7 @@ begin
   end;
 end;
 
-function TQueryInterbase.Open(Value: string): iQuery;
+function TQueryIBExpress.Open(Value: string): iQuery;
 begin
   Result := Self;
   FQuery.Close;
@@ -153,12 +157,12 @@ begin
   FDataSet := FQuery;
 end;
 
-function TQueryInterbase.Query: TObject;
+function TQueryIBExpress.Query: TObject;
 begin
   Result := FQuery;
 end;
 
-function TQueryInterbase.Add(Value: string): iQuery;
+function TQueryIBExpress.Add(Value: string): iQuery;
 begin
   Result := Self;
   FSQL.Add(Value);

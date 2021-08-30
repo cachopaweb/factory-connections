@@ -1,23 +1,23 @@
-unit UnitConexao.Model.Interbase;
+unit UnitConnection.Model.IBExpress;
 
 interface
 
-uses UnitConexao.Model.Interfaces, IBX.IBDatabase, System.Generics.Collections;
+uses UnitConnection.Model.Interfaces, IBX.IBDatabase, System.Generics.Collections;
 
 type
-  TConexaoInterbase = class(TInterfacedObject, iConexao)
+  TConnectionIBExpress = class(TInterfacedObject, iConnection)
     private
-      FConexao: TIBDatabase;
-      FTransacao: TIBTransaction;
+      FConnection: TIBDatabase;
+      FTransaction: TIBTransaction;
       FCaminhoBD: string;
       FUsuario  : string;
       FSenha    : string;
       FConnList: TObjectList<TObject>;
     public
-      class var Instancia: iConexao;
+      class var Instancia: iConnection;
       constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
       destructor Destroy; override;
-      class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
+      class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConnection;
       function Connected : Integer;
       procedure Disconnected(Index : Integer);
       function GetListaConexoes: TObjectList<TObject>;
@@ -30,9 +30,9 @@ uses
 
 
 
-{ TConexaoInterbase }
+{ TConnectionIBExpress }
 
-function TConexaoInterbase.Connected: Integer;
+function TConnectionIBExpress.Connected: Integer;
 begin
  if not Assigned(FConnList) then
     FConnList := TObjectList<TObject>.Create;
@@ -44,36 +44,36 @@ begin
   TIBDatabase(FConnList.Items[Result]).Params.AddPair('password', FSenha);
   TIBDatabase(FConnList.Items[Result]).LoginPrompt := False;
   TIBDatabase(FConnList.Items[Result]).Connected := True;
-  FTransacao := TIBTransaction.Create(nil);
-  FTransacao.DefaultDatabase := TIBDataBase(TIBDatabase(FConnList.Items[Result]));
+  FTransaction := TIBTransaction.Create(nil);
+  FTransaction.DefaultDatabase := TIBDataBase(TIBDatabase(FConnList.Items[Result]));
 end;
 
-constructor TConexaoInterbase.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
+constructor TConnectionIBExpress.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
 begin
   FCaminhoBD := CaminhoBD;
   FUsuario := Usuario;
   FSenha := Senha;
 end;
 
-destructor TConexaoInterbase.Destroy;
+destructor TConnectionIBExpress.Destroy;
 begin
-  FreeAndNil(FConexao);
+  FreeAndNil(FConnection);
   inherited;
 end;
 
-procedure TConexaoInterbase.Disconnected(Index: Integer);
+procedure TConnectionIBExpress.Disconnected(Index: Integer);
 begin
   TIBDatabase(FConnList.Items[Index]).Connected := False;
   FConnList.Items[Index].Free;
   FConnList.TrimExcess;
 end;
 
-function TConexaoInterbase.GetListaConexoes: TObjectList<TObject>;
+function TConnectionIBExpress.GetListaConexoes: TObjectList<TObject>;
 begin
   Result := FConnList;
 end;
 
-class function TConexaoInterbase.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
+class function TConnectionIBExpress.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConnection;
 begin
   if Singleton then
   begin

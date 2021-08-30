@@ -39,12 +39,12 @@ requires
   ibxpress;
 
 contains
-  UnitConexao.Model.Interfaces in 'src\UnitConexao.Model.Interfaces.pas',
-  UnitConexao.FireDAC.Model in 'src\FireDAC\UnitConexao.FireDAC.Model.pas',
-  UnitFactory.Conexao.FireDAC in 'src\FireDAC\UnitFactory.Conexao.FireDAC.pas',
+  UnitConnection.Model.Interfaces in 'src\UnitConnection.Model.Interfaces.pas',
+  UnitConnection.Firedac.Model in 'src\FireDAC\UnitConnection.Firedac.Model.pas',
+  UnitFactory.Connection.Firedac in 'src\FireDAC\UnitFactory.Connection.Firedac.pas',
   UnitQuery.FireDAC.Model in 'src\FireDAC\UnitQuery.FireDAC.Model.pas',
-  UnitConexao.Model.Interbase in 'src\IBExpress\UnitConexao.Model.Interbase.pas',
-  UnitConexao.Model.Query.Interbase in 'src\IBExpress\UnitConexao.Model.Query.Interbase.pas',
-  UnitFactory.Conexao.Interbase in 'src\IBExpress\UnitFactory.Conexao.Interbase.pas';
+  UnitConnection.Model.IBExpress in 'src\IBExpress\UnitConnection.Model.IBExpress.pas',
+  UnitConnection.Model.Query.IBExpress in 'src\IBExpress\UnitConnection.Model.Query.IBExpress.pas',
+  UnitFactory.Connection.IBExpress in 'src\IBExpress\UnitFactory.Connection.IBExpress.pas';
 
 end.

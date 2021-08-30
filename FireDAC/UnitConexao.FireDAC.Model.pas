@@ -17,7 +17,7 @@ type
     FCaminhoBD: string;
     FUsuario  : string;
     FSenha    : string;
-    FConnList: TObjectList<TObject>;
+    FConnList: TObjectList<TFDConnection>;
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
   public
     constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
@@ -26,7 +26,7 @@ type
     class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConexao;
     function Connected: Integer;
     procedure Disconnected(Index: Integer);
-    function GetListaConexoes: TObjectList<TObject>;
+    function GetListaConexoes: TObjectList<TFDConnection>;
   end;
 
 var
@@ -70,25 +70,25 @@ end;
 function TConexaoFireDAC.Connected: Integer;
 begin
   if not Assigned(FConnList) then
-    FConnList := TObjectList<TObject>.Create;
+    FConnList := TObjectList<TFDConnection>.Create;
 
   FConnList.Add(TFDConnection.Create(nil));
   Result := Pred(FConnList.Count);
-  TFDConnection(FConnList.Items[Result]).Params.DriverID := 'FB';
-  TFDConnection(FConnList.Items[Result]).Params.Database := FCaminhoBD;
-  TFDConnection(FConnList.Items[Result]).Params.UserName := FUsuario;
-  TFDConnection(FConnList.Items[Result]).Params.Password := FSenha;
-  TFDConnection(FConnList.Items[Result]).Connected;
+  FConnList.Items[Result].Params.DriverID := 'FB';
+  FConnList.Items[Result].Params.Database := FCaminhoBD;
+  FConnList.Items[Result].Params.UserName := FUsuario;
+  FConnList.Items[Result].Params.Password := FSenha;
+  FConnList.Items[Result].Connected;
 end;
 
 procedure TConexaoFireDAC.Disconnected(Index: Integer);
 begin
-  TFDConnection(FConnList.Items[Index]).Connected := False;
+  FConnList.Items[Index].Connected := False;
   FConnList.Items[Index].Free;
   FConnList.TrimExcess;
 end;
 
-function TConexaoFireDAC.GetListaConexoes: TObjectList<TObject>;
+function TConexaoFireDAC.GetListaConexoes: TObjectList<TFDConnection>;
 begin
   Result := FConnList;
 end;

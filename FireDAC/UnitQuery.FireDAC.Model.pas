@@ -2,7 +2,7 @@ unit UnitQuery.FireDAC.Model;
 
 interface
 
-uses UnitConnection.Model.Interfaces, Data.DB,
+uses UnitConexao.Model.Interfaces, Data.DB,
      System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
      FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
      FireDAC.Phys, FireDAC.Comp.Client, FireDAC.Phys.FB,
@@ -11,19 +11,19 @@ uses UnitConnection.Model.Interfaces, Data.DB,
      System.Generics.Collections;
 
 type
-  TQueryFirerac = class(TInterfacedObject, iQuery)
+  TQueryFireDAC = class(TInterfacedObject, iQuery)
     private
       FQuery: TFDQuery;
-      FConexao: iConnection;
+      FConexao: iConexao;
       FDataSet: TDataSet;
       FSQL: TStringList;
       FParams: TDictionary<string, variant>;
       FCampoBlob: TDictionary<string, boolean>;
       FIndiceConexao: Integer;
     public
-      constructor Create(Value: iConnection);
+      constructor Create(Value: iConexao);
       destructor Destroy; override;
-      class function New(Value: iConnection) : iQuery;
+      class function New(Value: iConexao) : iQuery;
       function Open(Value: string): iQuery;overload;
       function Open: iQuery;overload;
       function Add(Value: string): iQuery;
@@ -43,14 +43,14 @@ uses
 
 { TQueryFireDAC }
 
-function TQueryFirerac.AddParam(Param: string; Value: variant; Blob: Boolean = false): iQuery;
+function TQueryFireDAC.AddParam(Param: string; Value: variant; Blob: Boolean = false): iQuery;
 begin
   Result := Self;
   FParams.AddOrSetValue(Param, Value);
   FCampoBlob.AddOrSetValue(Param, Blob);
 end;
 
-function TQueryFirerac.Clear: iQuery;
+function TQueryFireDAC.Clear: iQuery;
 begin
   Result := Self;
   FSQL.Clear;
@@ -58,7 +58,7 @@ begin
   FCampoBlob.Clear;
 end;
 
-constructor TQueryFirerac.Create(Value: iConnection);
+constructor TQueryFireDAC.Create(Value: iConexao);
 begin
   FDataSet := TDataSet.Create(nil);
   FQuery := TFDQuery.Create(nil);
@@ -71,12 +71,12 @@ begin
   FCampoBlob := TDictionary<String, Boolean>.Create;
 end;
 
-function TQueryFirerac.DataSet: TDataSet;
+function TQueryFireDAC.DataSet: TDataSet;
 begin
   Result := FDataSet;
 end;
 
-destructor TQueryFirerac.Destroy;
+destructor TQueryFireDAC.Destroy;
 begin
   FreeAndNil(FParams);
   FreeAndNil(FSQL);
@@ -85,7 +85,7 @@ begin
   inherited;
 end;
 
-function TQueryFirerac.ExecSQL: iQuery;
+function TQueryFireDAC.ExecSQL: iQuery;
 var
   param: string;
   Valor: Variant;
@@ -119,12 +119,12 @@ begin
   end;
 end;
 
-class function TQueryFirerac.New(Value: iConnection) : iQuery;
+class function TQueryFireDAC.New(Value: iConexao) : iQuery;
 begin
   result := Self.Create(Value);
 end;
 
-function TQueryFirerac.Open: iQuery;
+function TQueryFireDAC.Open: iQuery;
 var
   param: string;
   Valor: Variant;
@@ -150,7 +150,7 @@ begin
   end;
 end;
 
-function TQueryFirerac.Open(Value: string): iQuery;
+function TQueryFireDAC.Open(Value: string): iQuery;
 begin
   Result := Self;
   FQuery.Close;
@@ -160,12 +160,12 @@ begin
   FDataSet := FQuery;
 end;
 
-function TQueryFirerac.Query: TObject;
+function TQueryFireDAC.Query: TObject;
 begin
    Result := FQuery;
 end;
 
-function TQueryFirerac.Add(Value: string): iQuery;
+function TQueryFireDAC.Add(Value: string): iQuery;
 begin
   Result := Self;
   FSQL.Add(Value);

@@ -1,4 +1,4 @@
-unit UnitConexao.Model.Interfaces;
+unit UnitConnection.Model.Interfaces;
 
 interface
 
@@ -11,7 +11,7 @@ uses
   FireDAC.Comp.UI;
 
   type
-    iConexao = interface
+    iConnection = interface
       ['{FA5FBBEB-2FDF-4395-8994-61D1DD98D8FD}']
       function Connected : Integer;
       procedure Disconnected(Index : Integer);
@@ -30,7 +30,7 @@ uses
       function DataSet: TDataSet;
     end;
 
-    iFactoryConexao = interface
+    iFactoryConnection = interface
       ['{4830BCA5-B7F0-4592-B6EE-D85F9A126867}']
       function Query: iQuery;
     end;
