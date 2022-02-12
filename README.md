@@ -1,4 +1,4 @@
-# factory-conection
+# factory-connections
 
 Create connection queries for Firedac and IBExpress
 
