@@ -3,12 +3,7 @@ unit UnitConnection.Model.Interfaces;
 interface
 
 uses
-  Data.DB, System.Generics.Collections,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
-  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
-  FireDAC.Phys, FireDAC.Comp.Client, FireDAC.Phys.FB,
-  FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-  FireDAC.Comp.UI;
+  Data.DB, System.Generics.Collections;
 
   type
     iConnection = interface

@@ -1,4 +1,4 @@
-# factory-conection
+# factory-connections
 
 Create connection queries for Firedac and IBExpress
 
@@ -25,7 +25,7 @@ begin
   Result := TJSONArray.Create; 
   Query := TFactoryConnectionFiredac.New('caminhoBD', 'usuario', 'senha').Query;
   Query.Add('SELECT CLI_CODIGO, CLI_NOME FROM CLIENTES WHERE CLI_CODIGO = :CODIGO');
-  Query.AddParm('CODIGO', Codigo);
+  Query.AddParam('CODIGO', Codigo);
   Query.Open;
   Query.DataSet.First;
   while not Query.DataSet.Eof do
@@ -44,7 +44,7 @@ end.
 
 uses System.SysUtils,
      System.Json,
-     UnitConexao.Model.Interfaces,
+     UnitConnection.Model.Interfaces,
      UnitFactory.Connection.IBExpress;
 
 function BuscaClientePorCodigo(Codigo: integer): TJSONArray;
@@ -55,7 +55,7 @@ begin
   Result := TJSONArray.Create; 
   Query := TFactoryConnectionIBExpress.New('caminhoBD', 'usuario', 'senha').Query;
   Query.Add('SELECT CLI_CODIGO, CLI_NOME FROM CLIENTES WHERE CLI_CODIGO = :CODIGO');
-  Query.AddParm('CODIGO', Codigo);
+  Query.AddParam('CODIGO', Codigo);
   Query.Open;
   Query.DataSet.First;
   while not Query.DataSet.Eof do
