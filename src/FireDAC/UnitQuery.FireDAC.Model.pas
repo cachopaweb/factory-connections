@@ -11,7 +11,7 @@ uses UnitConnection.Model.Interfaces, Data.DB,
      System.Generics.Collections;
 
 type
-  TQueryFirerac = class(TInterfacedObject, iQuery)
+  TQueryFiredac = class(TInterfacedObject, iQuery)
     private
       FQuery: TFDQuery;
       FConexao: iConnection;
@@ -42,14 +42,14 @@ uses
 
 { TQueryFireDAC }
 
-function TQueryFirerac.AddParam(Param: string; Value: variant; Blob: Boolean = false): iQuery;
+function TQueryFiredac.AddParam(Param: string; Value: variant; Blob: Boolean = false): iQuery;
 begin
   Result := Self;
   FParams.AddOrSetValue(Param, Value);
   FCampoBlob.AddOrSetValue(Param, Blob);
 end;
 
-function TQueryFirerac.Clear: iQuery;
+function TQueryFiredac.Clear: iQuery;
 begin
   Result := Self;
   FSQL.Clear;
@@ -57,7 +57,7 @@ begin
   FCampoBlob.Clear;
 end;
 
-constructor TQueryFirerac.Create(Value: iConnection);
+constructor TQueryFiredac.Create(Value: iConnection);
 begin
   FQuery := TFDQuery.Create(nil);
   FConexao := Value;
@@ -69,12 +69,12 @@ begin
   FCampoBlob := TDictionary<String, Boolean>.Create;
 end;
 
-function TQueryFirerac.DataSet: TDataSet;
+function TQueryFiredac.DataSet: TDataSet;
 begin
   Result := FQuery;
 end;
 
-destructor TQueryFirerac.Destroy;
+destructor TQueryFiredac.Destroy;
 begin
   FQuery.DisposeOf;
   FreeAndNil(FParams);
@@ -84,7 +84,7 @@ begin
   inherited;
 end;
 
-function TQueryFirerac.ExecSQL: iQuery;
+function TQueryFiredac.ExecSQL: iQuery;
 var
   param: string;
   Valor: Variant;
@@ -117,12 +117,12 @@ begin
   end;
 end;
 
-class function TQueryFirerac.New(Value: iConnection) : iQuery;
+class function TQueryFiredac.New(Value: iConnection) : iQuery;
 begin
   result := Self.Create(Value);
 end;
 
-function TQueryFirerac.Open: iQuery;
+function TQueryFiredac.Open: iQuery;
 var
   param: string;
   Valor: Variant;
@@ -147,7 +147,7 @@ begin
   end;
 end;
 
-function TQueryFirerac.Open(Value: string): iQuery;
+function TQueryFiredac.Open(Value: string): iQuery;
 begin
   Result := Self;
   FQuery.Close;
@@ -156,12 +156,12 @@ begin
   FQuery.Open;
 end;
 
-function TQueryFirerac.Query: TObject;
+function TQueryFiredac.Query: TObject;
 begin
    Result := FQuery;
 end;
 
-function TQueryFirerac.Add(Value: string): iQuery;
+function TQueryFiredac.Add(Value: string): iQuery;
 begin
   Result := Self;
   FSQL.Add(Value);

@@ -41,7 +41,7 @@ end;
 
 function TFactoryConnectionFiredac.Query: iQuery;
 begin
-  Result := TQueryFirerac.New(FConexao);
+  Result := TQueryFiredac.New(FConexao);
 end;
 
 end.

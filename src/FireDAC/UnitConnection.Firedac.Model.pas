@@ -6,9 +6,7 @@ uses UnitConnection.Model.Interfaces,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FB,
-  FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-  FireDAC.VCLUI.Wait,
-  FireDAC.Comp.UI, System.Generics.Collections;
+  FireDAC.Phys.FBDef, FireDAC.Phys.IBBase, FireDAC.Comp.UI, System.Generics.Collections;
 
 type
   TConnectionFiredac = class(TInterfacedObject, iConnection)
@@ -79,6 +77,7 @@ begin
   TFDConnection(FConnList.Items[Result]).Params.Database := FCaminhoBD;
   TFDConnection(FConnList.Items[Result]).Params.UserName := FUsuario;
   TFDConnection(FConnList.Items[Result]).Params.Password := FSenha;
+  TFDConnection(FConnList.Items[Result]).Params.Add('CharacterSet=utf8');
   TFDConnection(FConnList.Items[Result]).Connected;
 end;
 
