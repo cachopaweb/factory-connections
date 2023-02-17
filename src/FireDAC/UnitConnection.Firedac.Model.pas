@@ -15,20 +15,20 @@ type
     FCaminhoBD: string;
     FUsuario  : string;
     FSenha    : string;
-    FConnList: TObjectList<TObject>;
-    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
+		FDGUIxWaitCursor1: TFDGUIxWaitCursor;
   public
     constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
     destructor Destroy; override;
-    class var Instancia: iConnection;
-    class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConnection;
-    function Connected: Integer;
-    procedure Disconnected(Index: Integer);
-    function GetListaConexoes: TObjectList<TObject>;
+		class var Instancia: iConnection;
+		class function New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConnection;
+		function Connected: Integer;
+		procedure Disconnected(Index: Integer);
+		function GetListaConexoes: TObjectList<TObject>;
   end;
 
 var
-  FDriver : TFDPhysFBDriverLink;
+	FDriver : TFDPhysFBDriverLink;
+	FConnList : TObjectList<TFDConnection>;
 
 implementation
 
@@ -47,7 +47,7 @@ end;
 
 destructor TConnectionFiredac.Destroy;
 begin
-  FConnList.DisposeOf;
+	FConnList.DisposeOf;
   FDGUIxWaitCursor1.DisposeOf;
   inherited;
 end;
@@ -69,27 +69,28 @@ end;
 function TConnectionFiredac.Connected: Integer;
 begin
   if not Assigned(FConnList) then
-    FConnList := TObjectList<TObject>.Create;
+		FConnList := TObjectList<TFDConnection>.Create;
 
   FConnList.Add(TFDConnection.Create(nil));
   Result := Pred(FConnList.Count);
-  TFDConnection(FConnList.Items[Result]).Params.DriverID := 'FB';
-  TFDConnection(FConnList.Items[Result]).Params.Database := FCaminhoBD;
-  TFDConnection(FConnList.Items[Result]).Params.UserName := FUsuario;
-  TFDConnection(FConnList.Items[Result]).Params.Password := FSenha;
-  TFDConnection(FConnList.Items[Result]).Params.Add('CharacterSet=utf8');
-  TFDConnection(FConnList.Items[Result]).Connected;
+	FConnList.Items[Result].Params.DriverID := 'FB';
+	FConnList.Items[Result].Params.Database := FCaminhoBD;
+	FConnList.Items[Result].Params.UserName := FUsuario;
+	FConnList.Items[Result].Params.Password := FSenha;
+	FConnList.Items[Result].Params.Add('CharacterSet=utf8');
+	FConnList.Items[Result].Connected;
 end;
 
 procedure TConnectionFiredac.Disconnected(Index: Integer);
 begin
-  TFDConnection(FConnList.Items[Index]).Connected := False;
-  FConnList.TrimExcess;
+	FConnList.Items[Index].Connected := False;
+  FConnList.Items[Index].Free;
 end;
 
 function TConnectionFiredac.GetListaConexoes: TObjectList<TObject>;
 begin
-  Result := FConnList;
+	Result := TObjectList<TObject>(FConnList);
 end;
 
 end.
+

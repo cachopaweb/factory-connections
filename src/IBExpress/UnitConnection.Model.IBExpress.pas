@@ -7,12 +7,11 @@ uses UnitConnection.Model.Interfaces, IBX.IBDatabase, System.Generics.Collection
 type
   TConnectionIBExpress = class(TInterfacedObject, iConnection)
     private
-      FConnection: TIBDatabase;
+			FConnection: TIBDatabase;
       FTransaction: TIBTransaction;
       FCaminhoBD: string;
       FUsuario  : string;
-      FSenha    : string;
-      FConnList: TObjectList<TObject>;
+			FSenha    : string;
     public
       class var Instancia: iConnection;
       constructor Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
@@ -21,7 +20,10 @@ type
       function Connected : Integer;
       procedure Disconnected(Index : Integer);
       function GetListaConexoes: TObjectList<TObject>;
-  end;
+	end;
+
+var
+	FConnList : TObjectList<TIBDatabase>;
 
 implementation
 
@@ -35,17 +37,17 @@ uses
 function TConnectionIBExpress.Connected: Integer;
 begin
  if not Assigned(FConnList) then
-    FConnList := TObjectList<TObject>.Create;
+		FConnList := TObjectList<TIBDatabase>.Create;
 
   FConnList.Add(TIBDatabase.Create(nil));
-  Result := Pred(FConnList.Count);
-  TIBDatabase(FConnList.Items[Result]).DatabaseName := FCaminhoBD;
-  TIBDatabase(FConnList.Items[Result]).Params.AddPair('user_name', FUsuario);
-  TIBDatabase(FConnList.Items[Result]).Params.AddPair('password', FSenha);
-  TIBDatabase(FConnList.Items[Result]).LoginPrompt := False;
-  TIBDatabase(FConnList.Items[Result]).Connected := True;
+	Result := Pred(FConnList.Count);
+	FConnList.Items[Result].DatabaseName := FCaminhoBD;
+	FConnList.Items[Result].Params.AddPair('user_name', FUsuario);
+	FConnList.Items[Result].Params.AddPair('password', FSenha);
+	FConnList.Items[Result].LoginPrompt := False;
+	FConnList.Items[Result].Connected := True;
   FTransaction := TIBTransaction.Create(nil);
-  FTransaction.DefaultDatabase := TIBDataBase(TIBDatabase(FConnList.Items[Result]));
+  FTransaction.DefaultDatabase := FConnList.Items[Result];
 end;
 
 constructor TConnectionIBExpress.Create(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey');
@@ -64,13 +66,13 @@ end;
 
 procedure TConnectionIBExpress.Disconnected(Index: Integer);
 begin
-  TIBDatabase(FConnList.Items[Index]).Connected := False;
-  FConnList.TrimExcess;
+	FConnList.Items[Index].Connected := False;
+	FConnList.Items[Index].Free;
 end;
 
 function TConnectionIBExpress.GetListaConexoes: TObjectList<TObject>;
 begin
-  Result := FConnList;
+  Result := TObjectList<TObject>(FConnList);
 end;
 
 class function TConnectionIBExpress.New(CaminhoBD: string; Usuario: string = 'SYSDBA'; Senha: string = 'masterkey'; Singleton: Boolean = true): iConnection;

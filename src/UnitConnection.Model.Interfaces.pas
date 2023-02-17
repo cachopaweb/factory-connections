@@ -9,7 +9,7 @@ uses
     iConnection = interface
       ['{FA5FBBEB-2FDF-4395-8994-61D1DD98D8FD}']
       function Connected : Integer;
-      procedure Disconnected(Index : Integer);
+			procedure Disconnected(Index : Integer);
       function GetListaConexoes: TObjectList<TObject>;
     end;
 
