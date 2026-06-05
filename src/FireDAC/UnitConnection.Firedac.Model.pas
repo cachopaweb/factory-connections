@@ -29,6 +29,8 @@ type
 var
 	FDriver : TFDPhysFBDriverLink;
 	FConnList : TObjectList<TFDConnection>;
+	FConnBusy : TList<Boolean>;
+	FConnLock : TObject;
 
 implementation
 
@@ -47,7 +49,10 @@ end;
 
 destructor TConnectionFiredac.Destroy;
 begin
-	FConnList.DisposeOf;
+  if Assigned(FConnBusy) then
+    FConnBusy.DisposeOf;
+  if Assigned(FConnList) then
+	  FConnList.DisposeOf;
   FDGUIxWaitCursor1.DisposeOf;
   inherited;
 end;
@@ -67,24 +72,52 @@ begin
 end;
 
 function TConnectionFiredac.Connected: Integer;
+var
+  I: Integer;
 begin
-  if not Assigned(FConnList) then
-		FConnList := TObjectList<TFDConnection>.Create;
+  TMonitor.Enter(FConnLock);
+  try
+    if not Assigned(FConnList) then
+    begin
+		  FConnList := TObjectList<TFDConnection>.Create;
+      FConnBusy := TList<Boolean>.Create;
+    end;
 
-  FConnList.Add(TFDConnection.Create(nil));
-  Result := Pred(FConnList.Count);
-	FConnList.Items[Result].Params.DriverID := 'FB';
-	FConnList.Items[Result].Params.Database := FCaminhoBD;
-	FConnList.Items[Result].Params.UserName := FUsuario;
-	FConnList.Items[Result].Params.Password := FSenha;
-	FConnList.Items[Result].Params.Add('CharacterSet=utf8');
-	FConnList.Items[Result].Connected;
+    for I := 0 to Pred(FConnList.Count) do
+    begin
+      if not FConnBusy[I] then
+      begin
+        Result := I;
+        FConnBusy[Result] := True;
+        if not FConnList.Items[Result].Connected then
+          FConnList.Items[Result].Connected := True;
+        Exit;
+      end;
+    end;
+
+    FConnList.Add(TFDConnection.Create(nil));
+    FConnBusy.Add(True);
+    Result := Pred(FConnList.Count);
+	  FConnList.Items[Result].Params.DriverID := 'FB';
+	  FConnList.Items[Result].Params.Database := FCaminhoBD;
+	  FConnList.Items[Result].Params.UserName := FUsuario;
+	  FConnList.Items[Result].Params.Password := FSenha;
+	  FConnList.Items[Result].Params.Add('CharacterSet=utf8');
+	  FConnList.Items[Result].Connected := True;
+  finally
+    TMonitor.Exit(FConnLock);
+  end;
 end;
 
 procedure TConnectionFiredac.Disconnected(Index: Integer);
 begin
-	FConnList.Items[Index].Connected := False;
-  FConnList.Items[Index].Free;
+  TMonitor.Enter(FConnLock);
+  try
+    if Assigned(FConnBusy) and (Index >= 0) and (Index < FConnBusy.Count) then
+      FConnBusy[Index] := False;
+  finally
+    TMonitor.Exit(FConnLock);
+  end;
 end;
 
 function TConnectionFiredac.GetListaConexoes: TObjectList<TObject>;
@@ -92,5 +125,11 @@ begin
 	Result := TObjectList<TObject>(FConnList);
 end;
 
+initialization
+  FConnLock := TObject.Create;
+
+finalization
+  FConnLock.Free;
+
 end.
-
+
