@@ -74,7 +74,9 @@ end;
 function TConnectionFiredac.Connected: Integer;
 var
   I: Integer;
+  Conexao: TFDConnection;
 begin
+  Conexao := nil;
   TMonitor.Enter(FConnLock);
   try
     if not Assigned(FConnList) then
@@ -89,28 +91,78 @@ begin
       begin
         Result := I;
         FConnBusy[Result] := True;
-        if not FConnList.Items[Result].Connected then
-          FConnList.Items[Result].Connected := True;
-        Exit;
+        Conexao := FConnList.Items[Result];
+        Break;
       end;
     end;
 
-    FConnList.Add(TFDConnection.Create(nil));
-    FConnBusy.Add(True);
-    Result := Pred(FConnList.Count);
-	  FConnList.Items[Result].Params.DriverID := 'FB';
-	  FConnList.Items[Result].Params.Database := FCaminhoBD;
-	  FConnList.Items[Result].Params.UserName := FUsuario;
-	  FConnList.Items[Result].Params.Password := FSenha;
-	  FConnList.Items[Result].Params.Add('CharacterSet=utf8');
-	  FConnList.Items[Result].Connected := True;
+    if not Assigned(Conexao) then
+    begin
+      Conexao := TFDConnection.Create(nil);
+      FConnList.Add(Conexao);
+      FConnBusy.Add(True);
+      Result := Pred(FConnList.Count);
+	    Conexao.Params.DriverID := 'FB';
+	    Conexao.Params.Database := FCaminhoBD;
+	    Conexao.Params.UserName := FUsuario;
+	    Conexao.Params.Password := FSenha;
+	    Conexao.Params.Add('CharacterSet=utf8');
+    end;
   finally
     TMonitor.Exit(FConnLock);
+  end;
+
+  try
+    if Conexao.Connected and not Conexao.Ping then
+      Conexao.Connected := False;
+    if not Conexao.Connected then
+      Conexao.Connected := True;
+  except
+    try
+      Conexao.Connected := False;
+    except
+      // A conexao remota pode ter sido encerrada pelo servidor.
+    end;
+    TMonitor.Enter(FConnLock);
+    try
+      if Assigned(FConnBusy) and (Result >= 0) and (Result < FConnBusy.Count) then
+        FConnBusy[Result] := False;
+    finally
+      TMonitor.Exit(FConnLock);
+    end;
+    raise;
   end;
 end;
 
 procedure TConnectionFiredac.Disconnected(Index: Integer);
+var
+  Conexao: TFDConnection;
 begin
+  Conexao := nil;
+  TMonitor.Enter(FConnLock);
+  try
+    if Assigned(FConnBusy) and (Index >= 0) and (Index < FConnBusy.Count) then
+      Conexao := FConnList.Items[Index];
+  finally
+    TMonitor.Exit(FConnLock);
+  end;
+
+  if Assigned(Conexao) then
+  begin
+    try
+      if Conexao.InTransaction then
+        Conexao.Rollback;
+      if Conexao.Connected and not Conexao.Ping then
+        Conexao.Connected := False;
+    except
+      try
+        Conexao.Connected := False;
+      except
+        // Garante que uma conexao quebrada nao bloqueie o pool.
+      end;
+    end;
+  end;
+
   TMonitor.Enter(FConnLock);
   try
     if Assigned(FConnBusy) and (Index >= 0) and (Index < FConnBusy.Count) then
@@ -132,4 +184,3 @@ finalization
   FConnLock.Free;
 
 end.
-
