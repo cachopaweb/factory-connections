@@ -139,30 +139,38 @@ var
   Conexao: TFDConnection;
 begin
   Conexao := nil;
+
+  // 1. Obtém a conexão com validação segura de limites
   TMonitor.Enter(FConnLock);
   try
-    if Assigned(FConnBusy) and (Index >= 0) and (Index < FConnBusy.Count) then
-      Conexao := FConnList.Items[Index];
+    if Assigned(FConnList) and (Index >= 0) and (Index < FConnList.Count) then
+      Conexao := FConnList[Index];
   finally
     TMonitor.Exit(FConnLock);
   end;
 
+  // 2. Trata o encerramento da conexão isoladamente (fora do Lock)
   if Assigned(Conexao) then
   begin
     try
+      // Cancela qualquer transação pendente sem travar
       if Conexao.InTransaction then
         Conexao.Rollback;
-      if Conexao.Connected and not Conexao.Ping then
+        
+      // Força o desligamento direto se estiver conectado
+      if Conexao.Connected then
         Conexao.Connected := False;
     except
+      // Se o Rollback ou disconnect suave falhar, força o encerramento
       try
-        Conexao.Connected := False;
+        Conexao.Close; // True ignora erros e força a desconexão do socket
       except
-        // Garante que uma conexao quebrada nao bloqueie o pool.
+        // Silencia exceções para garantir que o pool recupere o controle
       end;
     end;
   end;
 
+  // 3. Libera o slot na lista de conexões ocupadas (FConnBusy)
   TMonitor.Enter(FConnLock);
   try
     if Assigned(FConnBusy) and (Index >= 0) and (Index < FConnBusy.Count) then
